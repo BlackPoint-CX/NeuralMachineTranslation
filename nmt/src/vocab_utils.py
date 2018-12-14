@@ -1,6 +1,12 @@
 import codecs
 import numpy as np
 import tensorflow as tf
+from tensorflow.contrib.lookup import lookup_ops
+
+UNK_ID = 0
+SOS = "<s>"
+EOS = "</s>"
+UNK = "<unk>"
 
 
 def load_embed_txt(embed_file):
@@ -92,3 +98,15 @@ def create_emb_for_encoder_and_decoder(src_vocab_size, tgt_vocab_size, src_embed
                                                   tgt_vocab_size, tgt_embed_size, dtype)
 
     return embedding_encoder, embedding_decoder
+
+
+def create_vocab_tables(src_vocab_file, tgt_vocab_file, share_vocab):
+    """Creates vocab tables for src_vocab_file and tgt_vocab_file."""
+    src_vocab_table = lookup_ops.index_table_from_file(
+        src_vocab_file, default_value=UNK_ID)
+    if share_vocab:
+        tgt_vocab_table = src_vocab_table
+    else:
+        tgt_vocab_table = lookup_ops.index_table_from_file(
+            tgt_vocab_file, default_value=UNK_ID)
+    return src_vocab_table, tgt_vocab_table
